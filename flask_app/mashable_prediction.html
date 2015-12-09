@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mashable Digital Content Decision Engine</title>
+    <link rel="stylesheet" href="static/d3.slider.css" />
+    <style>
+
+     body {
+       font-family: Verdana,Arial,sans-serif;
+     }
+     h2 {
+       font-size: 1.0em;
+       margin: 25px 0 5px 0;
+       color: dimgrey;
+     }
+     h1 {
+       font-size: 1.2em;
+       margin: 50px 0 5px 0;
+       color: black;
+     }
+     #left_side {
+        float: left;
+     }
+     #right_side {
+        margin-left: 700px;
+     }
+    .table{
+        display: table;
+        width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+     }
+     .space {
+        margin-bottom: 0 px;
+     }
+     .wrapper {
+       width: 800px;
+       margin-left: auto;
+       margin-right: auto;
+       margin-bottom: 0px;
+     }
+     #bar_chart {
+       margin-bottom: 0px;
+     }
+     .bar {
+       fill: #1A79BB;
+     }
+     span {
+       color: #1A79BB;
+     }
+     span2 {
+       color: #1A79BB;
+     }
+     textarea { 
+       font-size: 18px; 
+       font-family: Verdana,Arial,sans-serif;
+     }
+    </style>
+  </head>
+
+
+  <body>
+  <div id="headline_textbox" class="wrapper"> 
+     <img src="static/mashable_logo.png" alt="Mashable Logo" style="width:640px;height:128px;">
+     <h1>Digital Content Decision Engine</h1>   
+     <h1>Inputs</h1>
+    <h2>Headline:</h2>
+    <div><textarea type="text" id="input_title" name="headline" style="width: 800px;height: 25px"></textarea></div>
+    <input type="submit" name="title" value="Sample Headline" onclick="setHeadlineInput(this); return false;">
+
+  <div id="content_textbox" class="wrapper">    
+    
+    <h2>Article Content:</h2>
+    <div><textarea type="text" id="input_content" name="content_box" style="width: 800px;height: 200px"></textarea></div>
+    <input type="submit" name="content" value="Sample Content" onclick="setContentInput(this); return false;">
+
+    <div id="tags_textbox" class="wrapper">    
+    
+    <h2>Article Tags:</h2>
+    <div><textarea type="text" id="input_tags" name="tags_box" style="width: 800px;height: 25px"></textarea></div>
+    <input type="submit" name="tags" value="Sample Tags" onclick="setTagsInput(this); return false;">
+    
+<div class = "table">
+    <div id = "left_side">    
+     <h2>Expected Day Published: <span id="day_published"></span></h2>
+      <select id="day_publishedSelect">
+        <option disabled selected> -- select an option -- </option>
+        <option value="Sunday">Sunday</option>
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+        <option value="Friday">Friday</option>
+        <option value="Saturday">Saturday</option>
+      </select>
+      
+        <h2>Channel: <span id="channel"></span></h2>
+      <select id="channelSelect">
+        <option disabled selected> -- select an option -- </option>
+        <option value="Business">Business</option>
+        <option value="Entertainment">Entertainment</option>
+        <option value="Lifestlye">Lifestyle</option>
+        <option value="Social Media">Social Media</option>
+        <option value="Technology">Technology</option>
+        <option value="World">World</option>
+      </select>
+</div>  
+</div> 
+<div id="sliders" class="wrapper">
+      <h2 class="feature">Images: <span id="img_num">0</span></h2>
+      <div id="img_slider"></div>
+</div>
+</br>
+</br>
+<div>
+    <div id = "right_side">
+        <button id="submitInputs" style="width:60px;height:40px;">Analyze</button>
+    </div>
+</div>
+<div>
+<h1>Content Statistics</h1>
+  <h2> Word Count: <span id="word_count"></span></h2>
+  <h2> Rate of Unique Words: <span id="unique_word"></span></h2>
+  <h2> Readability (Flesch–Kincaid): <span id="readability"></span></h2>
+      <div id="readability_chart">
+      </div>
+  <h2> Grade Level (Flesch–Kincaid): <span id="grade_level"></span></h2>
+      <div id="grade_level_chart">
+      </div>
+</div>
+<div>
+<h1>Sentiment Analysis</h1>
+  <h2> Headline Polarity: <span id="headline_polarity"></span></h2>
+  <h2> Contnent Polarity: <span id="content_polarity"></span></h2>
+</div>
+<div>
+  <h2> Polarity Bubble Chart: <span id="polarity_bubble_chart"></span></h2>
+  <div id="polarity_chart">
+      </div>
+</div>
+<div>
+  <h2> Subjectivity: <span id="subjectivity"></span></h2>
+  <div id="subjectivity_chart">
+      </div>
+</div>
+<div>
+<h1>Model Results</h1>
+  <h2> Predicted Shares: <span id="predicted_shares"></span></h2>
+  <h2> Virality Score: <span id="virality_score"></span></h2>
+  <h2> <input id="viral_dial" type="text" value="0" class="dial"></h2>
+</div>
+<div>
+<h1>Recommendations</h1>
+<div>
+    <div id = "right_side">
+        <button id="submitRecommend" style="width:120x;height:40px;" >Recommend</button>
+    </div>
+</div>
+<div id = "recommendations"> </div>
+</div>
+
+<!-- Import the libraries: jQuery, d3, d3.slider -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="static/d3.slider.js"></script>
+    <script src="static/jquery.knob.js"></script>
+
+    <script>
+    var current_img_num = 0
+    var current_day_published = $("#day_publishedSelect").val()
+    var current_channel = $("#channelSelect").val();
+    var current_readability = 0
+    var current_grade_level = 0
+    var current_subjectivity = 0
+
+    var readability_chart = d3.select("#readability_chart")
+                   .append("svg:svg")
+                   .attr("width", 800)
+                   .attr("height", 60);
+     var readability_scale = d3.scale.linear()
+                                .domain([0, 100])
+                                .range([0, 800]);
+     var readability_bar = readability_chart.append("g")
+                    .attr("class", "bar")
+   readability_bar.append("svg:rect")
+          .attr("id", "readability_score")
+          .attr("class", "bar")
+          .attr("width", readability_scale(current_readability))
+          .attr("height", 50);
+     readability_bar.append("text")
+        .attr("id", "readability_text")
+        .attr("dy", ".75em")
+        .attr("y", 15)
+        .attr("x", readability_scale(current_readability-5))
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .attr("font-size", 20)
+        .text( current_readability.toFixed(1));
+
+    var grade_level_chart = d3.select("#grade_level_chart")
+                   .append("svg:svg")
+                   .attr("width", 800)
+                   .attr("height", 60);
+     var grade_level_scale = d3.scale.linear()
+                                .domain([0, 15])
+                                .range([0, 800]);
+     var grade_level_bar = grade_level_chart.append("g")
+                    .attr("class", "bar")
+   grade_level_bar.append("svg:rect")
+          .attr("id", "grade_level_score")
+          .attr("class", "bar")
+          .attr("width", grade_level_scale(current_grade_level))
+          .attr("height", 50);
+     grade_level_bar.append("text")
+        .attr("id", "grade_level_text")
+        .attr("dy", ".75em")
+        .attr("y", 15)
+        .attr("x", grade_level_scale(current_grade_level-5))
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .attr("font-size", 20)
+        .text( current_grade_level.toFixed(1));
+
+    var subjectivity_chart = d3.select("#subjectivity_chart")
+                   .append("svg:svg")
+                   .attr("width", 800)
+                   .attr("height", 60);
+     var subjectivity_scale = d3.scale.linear()
+                                .domain([0, 1])
+                                .range([0, 800]);
+     var subjectivity_bar = subjectivity_chart.append("g")
+                    .attr("class", "bar")
+     subjectivity_bar.append("svg:rect")
+          .attr("id", "subjectivity_score")
+          .attr("class", "bar")
+          .attr("width", subjectivity_scale(current_subjectivity))
+          .attr("height", 50);
+     subjectivity_bar.append("text")
+        .attr("id", "subjectivity_text")
+        .attr("dy", ".75em")
+        .attr("y", 15)
+        .attr("x", subjectivity_scale(current_subjectivity-5))
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .attr("font-size", 20)
+        .text( current_subjectivity.toFixed(1));
+
+    var bubble = d3.layout.pack()
+        .sort(null)
+        .size([750, 750])
+        .padding(1.5);
+
+    var polarity_chart = d3.select("#polarity_chart")
+                  .append("svg:svg")
+                  .attr("width", 750)
+                  .attr("height", 750)
+                  .attr("class", "bubble");
+
+    var headline_text = 'Facebook rolls out suicide prevention tools in Australia';
+    function setHeadlineInput(button) {
+    var buttonVal = button.name,
+    headline_textbox = document.getElementById('input_' + buttonVal);
+    headline_textbox.value = headline_text ;
+    }
+
+    var content_text = "Many of us confess more about our feelings on Facebook than we might ever say face-to-face with another person. Recognising it could have a role to play in preventing self-harm, Facebook has come up with a number of suicide prevention tools to help people who may be depressed. The program launched in the U.S. in February, and is now rolling out in Australia, a Facebook spokesperson confirmed to Mashable Australia.  In the U.S., Facebook partnered with local mental health initiatives including Forefront, Now Matters Now and the National Suicide Prevention Lifeline to develop the language around the initiative. In Australia, Facebook is working with BeyondBlue and Headspace in a collaboration announced Friday.  Keeping people safe is our most important responsibility on Facebook, the spokesperson said.  If someone thinks another person is considering suicide based on their Facebook posts, they are urged to call emergency services, but also to report the material to Facebook.  The company said it has teams working around the clock to review the reports. Depending on the seriousness of the threat, those assessing the posts can encourage the author to speak to a mental health expert through a private pop-up message or to reach out to a friend, or even provide advice on how to come to terms with their feelings.  We're also providing new resources and support to the person who flagged the troubling post, the spokesperson said, including options for them to call or message their distressed friend letting them know they care, or reaching out to another friend or a trained professional at a suicide hotline for support.  Globally there are multiple millions of users all going through these same problems, Chris Tanti, Headspace CEO told Fairfax Media about the tools. People can be notified and help can be provided just about anywhere in Australia, which is fantastic.";
+    function setContentInput(button) {
+    var buttonVal = button.name,
+    content_textbox = document.getElementById('input_' + buttonVal);
+    content_textbox.value = content_text ;
+    }
+
+  var tag_text = "Australia, Facebook, Mental Health, Social Media ";
+    function setTagsInput(button) {
+    var buttonVal = button.name,
+    tag_textbox = document.getElementById('input_' + buttonVal);
+    tag_textbox.value = tag_text ;
+    }
+
+    $( document ).ready(function() {
+    $("#submitInputs").click(function() {
+      var headline = $("#input_title").val()
+      var content = $("#input_content").val()
+      var tags = $("#input_tags").val();
+    
+      $.ajax({
+         type: "POST",
+         contentType: "application/json; charset=utf-8",
+         url: "/make_predict",
+         dataType: "json",
+         async: true,
+         data: "{\"headline\": \""+headline+"\", \"content\": \""+content+"\", \"tags\": \"" + tags + "\", \"num_imgs\": \"" + current_img_num + "\", \"day_pub\": \"" + current_day_published + "\", \"channel\": \"" + current_channel + "\"}",
+         success: function (data) {
+                    $("#word_count").html(data.n_tokens_content);
+                    $("#unique_word").html(data.r_unique_tokens);
+                    $("#headline_polarity").html(data.title_sentiment_polarity);
+                    $("#content_polarity").html(data.global_sentiment_polarity);
+                    $("#predicted_shares").html(data.est_shares);
+                    var readability = data["global_reading_ease"];
+                       d3.select("#readability_score")
+                         .attr("width", readability_scale(readability));
+                       d3.select("#readability_text")
+                         .attr("x", readability_scale(readability)-30)
+                         .text(readability.toFixed(1));
+                    var grade_level = data["global_grade_level"];
+                       d3.select("#grade_level_score")
+                         .attr("width", grade_level_scale(grade_level));
+                       d3.select("#grade_level_text")
+                         .attr("x", grade_level_scale(grade_level)-30)
+                         .text(grade_level.toFixed(1));
+                    var subjectivity = data["global_subjectivity"];
+                       d3.select("#subjectivity_score")
+                         .attr("width", subjectivity_scale(subjectivity));
+                       d3.select("#subjectivity_text")
+                         .attr("x", subjectivity_scale(subjectivity)-30)
+                         .text(subjectivity.toFixed(2));
+                    var bubble_data = data['polarity_data'];
+                    bubble_data = bubble_data.map(function(d){ d.value = +d["polarity"]; return d; });
+                    var nodes = bubble.nodes({children:bubble_data}).filter(function(d) { return !d.children; });
+                    polarity_chart.selectAll("*").remove();
+                    var bubbles = polarity_chart.append("g")
+                         .attr("transform", "translate(0,0)")
+                         .selectAll(".bubble")
+                         .data(nodes)
+                         .enter();
+                    bubbles.append("circle")
+                         .attr("r", function(d){ return d.value * 200; })
+                         .attr("cx", function(d){ return d.x; })
+                         .attr("cy", function(d){ return d.y; })
+                         .style("fill", function(d) { return d['color']; })
+                         .style("fill-opacity", .85)
+                         .style("stroke-width",".2em");
+                    bubbles.append("text")
+                         .attr("x", function(d){ return d.x; })
+                         .attr("y", function(d){ return d.y + 5; })
+                         .attr("text-anchor", "middle")
+                         .text(function(d){ return d['word']; })
+                         .style({
+                             "fill":"white", 
+                             "font-family":"Helvetica Neue, Helvetica, Arial, san-serif",
+                             "font-size": "12px"
+                         });
+                    var est_prob = data["est_prob"] * 100;
+                    $('#viral_dial').val(est_prob).trigger('change');
+
+         }           
+         })
+    });
+  });
+
+      $( document ).ready(function() {
+      $("#submitRecommend").click(function() {
+      var headline = $("#input_title").val()
+      var content = $("#input_content").val()
+      var tags = $("#input_tags").val();
+      $.ajax({
+               type: "POST",
+               contentType: "application/json; charset=utf-8",
+               url: "/get_recommend",
+               dataType: "json",
+               async: true,
+               data: "{\"headline\": \""+headline+"\", \"content\": \""+content+"\", \"tags\": \"" + tags + "\", \"num_imgs\": \"" + current_img_num + "\", \"day_pub\": \"" + current_day_published + "\", \"channel\": \"" + current_channel + "\"}",
+               success: function (data) {
+                    $("#recommendations").empty();
+                    if (parseFloat(data.is_weekend) != 1) {
+                    $("#recommendations").append( "<h2> Recommendation: <span>Mashable users tend to share more content on the weekends.  Consider publishing on Sunday for the follwing improvement in results --</span> </h2>" );
+                    var inc_shares = parseInt(data.est_shares_sun) - parseInt(data.est_shares);
+                    $("#recommendations").append("<h2> Increase in Estimated Shares: <span id='inc_shares'></span></h2>" );
+                    $("#inc_shares").html(inc_shares);
+                    var inc_viral = parseInt(data.est_shares_sun) - parseInt(data.est_shares);
+                    $("#recommendations").append("<h2> Increase in Virality Score:</h2> <h2> <input id='inc_viral' type='text' value='0' class='dial'></h2>" );
+                    $(function() {
+                    $("#inc_viral").knob({
+                      'readOnly': true,
+                      'fgColor': '#1A79BB',
+                      'inputColor': '#1A79BB', 
+                       'format' : function (value) {
+                                  return value + '%';
+                        }});
+                      });
+                    var inc_viral = data["est_prob_sun"] * 100 - data["est_prob"] * 100;
+                    $('#inc_viral').val(inc_viral).trigger('change');
+                    };
+                    if (parseFloat(data.global_subjectivity) < .6) {
+                    $("#recommendations").append("<h2> Recommendation: <span>Consumers of Mashable tend to be more likely to share content containing un-biased analysis.  Since the subjectivity of the content is less then .6, consider adding additional analysis. </span> </h2>");
+                    };
+                    if (parseFloat(data.global_rate_positive_words) < .05) {
+                    $("#recommendations").append("<h2> Recommendation: <span>Content containing a higher ratio of positive language tends to be more viral. Since the global rate of positive words is less then 5%, consider increasing the amount of positie language.</span> </h2> <h2></h2>");
+                    };
+         }            
+         })
+    });
+  });
+
+    <!-- SLIDERS, DROPDOWNS AND DIALS -->
+
+    $("#day_publishedSelect")
+     .change(function() {
+       current_day_published = $(this).val();
+       var day_published = $("#day_publishedSelect option:selected").text()
+       document.getElementById("day_published").textContent=day_published;
+     }); 
+    
+    $("#channelSelect")
+     .change(function() {
+       current_channel = $(this).val();
+       var channel_name = $("#channelSelect option:selected").text()
+       document.getElementById("channel").textContent=channel_name;
+     }); 
+
+    $(function() {
+            $("#viral_dial").knob({
+              'readOnly': true,
+              'fgColor': '#1A79BB',
+              'inputColor': '#1A79BB', 
+               'format' : function (value) {
+                          return value + '%';
+        }});
+      });
+
+     d3.select('#img_slider')
+       .call(
+         d3.slider()
+           .min(0)
+           .max(25)
+           .step(1)
+           .axis(true)
+           .on("slide", function(evt,value) {
+             d3.select('#img_num').text(value);
+             current_img_num = value;
+         })
+       );
+
+       </script>
+      </body>
