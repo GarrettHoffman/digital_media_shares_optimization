@@ -5,6 +5,17 @@ from bs4 import BeautifulSoup
 import pymongo
 
 def get_mashable_content(doc):
+
+    """
+    Pulls URL from mongoDB document and scrapes article title, article content
+    and number of tags.  Stores results in MongoDB collection.
+
+    Arguements:
+    doc: MongoDB document containing mashable URL
+
+    Output:
+    Stores scraped data in MongoDB document
+    """
     
     # request html data and create soup
     response = requests.get(doc['url'])
@@ -46,12 +57,15 @@ def get_mashable_content(doc):
                                                       "content": content,
                                                       "num_tags": num_tags}})
 
+# connect to MongoDB collection
 client = pymongo.MongoClient()
 db = client.mashable
 collection = client.mashable.articles
 
+#define progress counter
 progress_counter = 0 
 
+# scrape mashable content for all URLs in collection
 for doc in collection.find():
 
     get_mashable_content(doc)

@@ -34,6 +34,8 @@ def viz_page():
 #recieve data from application, get results from analysis and send back to javascript
 @app.route('/make_predict', methods=["POST"])
 def make_predict():
+
+    # call data from ajax request and define inputs
     data = flask.request.json
     headline = data["headline"]
     content = data["content"].encode('utf8')
@@ -41,6 +43,8 @@ def make_predict():
     day_published = data["day_pub"]
     channel = data["channel"]
     num_imgs = int(data["num_imgs"])
+
+    # create blank data frame for model input data
     index = [0]
     columns = [u'LDA_0_prob', u'LDA_1_prob', u'LDA_2_prob', u'LDA_3_prob',
        u'LDA_4_prob', u'LDA_5_prob', u'LDA_6_prob', u'LDA_7_prob',
@@ -63,15 +67,23 @@ def make_predict():
        u'weekday_is_monday', u'weekday_is_saturday', u'weekday_is_sunday',
        u'weekday_is_thursday', u'weekday_is_tuesday', u'weekday_is_wednesday']
     data_df = pd.DataFrame(index=index, columns=columns)
+
+    # generate features for inputs using functions from static.generate_features
     create_metadata_fields(data_df, num_imgs, tags, day_published, channel)
     create_NLP_features(data_df, headline, content)
     create_lda_features(data_df, content)
+
+    # generate dictionary with data fields to send back to javascript
     results = {}
     create_metadata_fields(results, num_imgs, tags, day_published, channel)
     create_NLP_features(results, headline, content)
     create_lda_features(results, content)
+
+    # generate model predictions and store in results
     results['est_shares'] = round(pois_reg.predict(sm.add_constant(data_df))[0],-2)
     results['est_prob'] = round(RF_class.predict_proba(sm.add_constant(data_df))[0][1],2)
+
+    # generate polarity data for word cloud and store in results
     polarity_list = [(w.decode('utf-8'), TextBlob(w.decode('utf-8')).polarity) 
                       for w in "".join(c for c in content 
                                        if c not in string.punctuation).split()]
@@ -79,12 +91,16 @@ def make_predict():
                      if p>0 
                      else {'word': w, 'polarity': abs(p), 'color': '#bb1a29'}
                      for (w,p) in polarity_list if p != 0]
-    results['polarity_data'] = polarity_data              
+    results['polarity_data'] = polarity_data 
+
+    # return results to javascript           
     return flask.jsonify(results)
 
 #recieve data from application, get results from recommendation and send back to javascript
 @app.route('/get_recommend', methods=["POST"])
 def get_recommend():
+
+    # repeat process above to get data for recommendations
     data = flask.request.json
     headline = data["headline"]
     content = data["content"].encode('utf8')
@@ -123,6 +139,8 @@ def get_recommend():
     create_lda_features(results, content)
     results['est_shares'] = round(pois_reg.predict(sm.add_constant(data_df))[0],-2)
     results['est_prob'] = round(RF_class.predict_proba(sm.add_constant(data_df))[0][1],2)
+
+    # change day of week data to sunday
     data_df['weekday_is_monday'] = 0
     data_df['weekday_is_tuesday'] = 0
     data_df['weekday_is_wednesday'] = 0
@@ -131,17 +149,19 @@ def get_recommend():
     data_df['weekday_is_saturday'] = 0
     data_df['weekday_is_sunday'] = 1
     data_df['is_weekend'] = 1
+
+    # get results if change to sunday
     results['est_shares_sun'] = round(pois_reg.predict(sm.add_constant(data_df))[0],-2)
     results['est_prob_sun'] = round(RF_class.predict_proba(sm.add_constant(data_df))[0][1],2)
+
+    # return results to javascript
     return flask.jsonify(results)
 
 #--------- RUN WEB APP SERVER ------------#
 
-# Start the app server on port 80
-# (The default website port)
+# Start the app server on port 5000
 
 if __name__ == '__main__':
-    app.run(debug=True,
-        host = "0.0.0.0",
+    app.run(host = "0.0.0.0",
         port = 5000
     )

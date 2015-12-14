@@ -12,7 +12,7 @@ from textstat.textstat import textstat
 import statsmodels.api as sm
 import sklearn
 
-# load topic model processing tools and LDA model
+# load topic model processing tools and LDA model for LDA feature engineering
 stop = stopwords.words('english')
 lmtzr = WordNetLemmatizer()
 dictionary = corpora.Dictionary.load('static/mashable_LDA_dictionary.dict')

@@ -9,6 +9,18 @@ from textstat.textstat import textstat
 
 def engineer_NLP_features(doc):
 
+    """
+    Generate NLP fatures (related to language and sentiment)
+    for mashable articles to be used in predicting no. of 
+    shares
+
+    Arguements:
+    doc: mongoDB document contating article content data
+
+    Output:
+    Stores NLP features results in MongoDB for Document
+    """
+
     # get article headline and article content from Mongo DB document
 
     headline = doc['title']
@@ -206,8 +218,10 @@ client = pymongo.MongoClient()
 db = client.mashable
 collection = client.mashable.articles
 
+# define progress counter
 progress_counter = 0 
 
+# generate NLP features for all content in MongoDB collection
 for doc in collection.find({}, {"title": 1, "content": 1}):
 
     engineer_NLP_features(doc)
