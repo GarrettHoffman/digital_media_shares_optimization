@@ -8,11 +8,11 @@ I encourage you to play around with the working prototype here: http://54.86.1.9
 
 #### Navigating this repo:
 
-*01_playgtound_files*: contains "playground" notebooks used for exploration before writing project scripts
+**01_playgtound_files**: contains "playground" notebooks used for exploration before writing project scripts
 
-*02_project_scrips*: contains scripts and notebooks used for project implemetation
+**02_project_scrips**: contains scripts and notebooks used for project implemetation
 
-*flask_app*: contains scripts and HTML for web application
+**flask_app**: contains scripts and HTML for web application
 
-*digital_content_deck* is the presentation deck
+**digital_content_deck** is the presentation deck
 
