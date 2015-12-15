@@ -1,4 +1,4 @@
-# 01_playgtound_files
+# 01_playground_files
 
 This directory contains "playground" notebooks used for exploration before writing project scripts
 

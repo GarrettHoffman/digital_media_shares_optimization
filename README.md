@@ -10,11 +10,10 @@ The Mashable URLs used in this analysis were obtained from this data set: https:
 
 #### Navigating this repo:
 
-**01_playgtound_files**: contains "playground" notebooks used for exploration before writing project scripts
+**01_playground_files**: contains "playground" notebooks used for exploration before writing project scripts
 
-**02_project_scrips**: contains scripts and notebooks used for project implemetation
+**02_project_scripts**: contains scripts and notebooks used for project implementation
 
 **flask_app**: contains scripts and HTML for web application
 
 **digital_content_deck** is the presentation deck
-
