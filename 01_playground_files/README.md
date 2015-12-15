@@ -8,4 +8,4 @@ This directory contains "playground" notebooks used for exploration before writi
 
 **03_mashable_LDA_model_features_playground.ipynb**: exploration regarding development of LDA model and engineering of LDA model features
 
-**04_mashable_model_prediction_playground.ipynb**: exploration regarding feature engineering and models to make a prediction on new content.
+**04_mashable_model_prediction_playground.ipynb**: exploration regarding feature engineering and models to make a prediction on new content
