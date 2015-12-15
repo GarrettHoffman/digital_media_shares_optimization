@@ -6,6 +6,8 @@ For this project I created models to predict the number of social media shares a
 
 I encourage you to play around with the working prototype here: http://54.86.1.93:5000
 
+The Mashable URLs used in this analysis were obtained from this data set: https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity
+
 #### Navigating this repo:
 
 **01_playgtound_files**: contains "playground" notebooks used for exploration before writing project scripts
